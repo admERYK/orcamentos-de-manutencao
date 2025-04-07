@@ -1,19 +1,71 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Orçamento Jardinagem</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    h1 { text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th, td { padding: 10px; border: 1px solid #ccc; text-align: left; }
-    input[type="number"] { width: 60px; }
-    .total { font-weight: bold; font-size: 1.2em; text-align: right; }
+    body { 
+      font-family: 'Arial', sans-serif; 
+      background-color: black;
+      color: white;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 { 
+      text-align: center; 
+      color: gold;
+    }
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-bottom: 20px; 
+    }
+    th, td { 
+      padding: 10px; 
+      border: 1px solid #ccc; 
+      text-align: left; 
+    }
+    input[type="number"], input[type="checkbox"] { 
+      width: 60px; 
+    }
+    .total { 
+      font-weight: bold; 
+      font-size: 1.2em; 
+      text-align: right; 
+      color: gold;
+    }
+    .lucro input {
+      width: 80px;
+    }
+    .botoes {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    button {
+      background-color: gold;
+      color: black;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #d4af37;
+    }
+    @media (max-width: 768px) {
+      .botoes {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
   <h1>Orçamento Jardinagem</h1>
+  
+  <!-- Tabela de Itens -->
   <table>
     <thead>
       <tr>
@@ -21,6 +73,7 @@
         <th>Preço (R$)</th>
         <th>Quantidade</th>
         <th>Subtotal (R$)</th>
+        <th>Incluir</th>
       </tr>
     </thead>
     <tbody id="itens">
@@ -29,42 +82,89 @@
         <td>6.05</td>
         <td><input type="number" min="0" value="0" data-preco="6.05"></td>
         <td class="subtotal">0.00</td>
+        <td><input type="checkbox" checked></td>
       </tr>
       <tr>
         <td>Diária por prestador</td>
         <td>50.00</td>
         <td><input type="number" min="0" value="0" data-preco="50.00"></td>
         <td class="subtotal">0.00</td>
+        <td><input type="checkbox" checked></td>
       </tr>
       <tr>
         <td>Saco de lixo (unidade)</td>
         <td>0.50</td>
         <td><input type="number" min="0" value="0" data-preco="0.50"></td>
         <td class="subtotal">0.00</td>
+        <td><input type="checkbox" checked></td>
       </tr>
       <tr>
         <td>Gasolina para carro (a cada 10km)</td>
         <td>20.00</td>
         <td><input type="number" min="0" value="0" data-preco="20.00"></td>
         <td class="subtotal">0.00</td>
+        <td><input type="checkbox" checked></td>
       </tr>
     </tbody>
   </table>
-  <div class="total">Total: R$ <span id="total">0.00</span></div>  <script>
-    const inputs = document.querySelectorAll('input[type="number"]');
 
+  <!-- Lucro e Total -->
+  <div class="lucro">
+    <label for="lucro">Lucro (%)</label>
+    <input type="number" id="lucro" value="20" min="0" max="100">
+  </div>
+  <div class="total">Total: R$ <span id="total">0.00</span></div>
+
+  <!-- Botões -->
+  <div class="botoes">
+    <button id="imprimirOrcamento">Imprimir orçamento</button>
+    <button id="enviarWhatsApp">Enviar para WhatsApp</button>
+  </div>
+
+  <script>
+    const inputs = document.querySelectorAll('input[type="number"]');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const lucroInput = document.getElementById('lucro');
+
+    // Função para calcular o total
     function calcularTotal() {
       let total = 0;
-      inputs.forEach(input => {
-        const preco = parseFloat(input.dataset.preco);
-        const qtd = parseFloat(input.value);
-        const subtotal = preco * qtd;
-        input.parentElement.nextElementSibling.textContent = subtotal.toFixed(2);
-        total += subtotal;
+      let lucro = parseFloat(lucroInput.value) / 100;
+
+      inputs.forEach((input, index) => {
+        if (checkboxes[index].checked) {
+          const preco = parseFloat(input.dataset.preco);
+          const qtd = parseFloat(input.value);
+          const subtotal = preco * qtd;
+          input.parentElement.nextElementSibling.textContent = subtotal.toFixed(2);
+          total += subtotal;
+        }
       });
+
+      total += total * lucro; // Aplicando o lucro
       document.getElementById('total').textContent = total.toFixed(2);
     }
 
+    // Eventos de interação
     inputs.forEach(input => input.addEventListener('input', calcularTotal));
-  </script></body>
+    checkboxes.forEach(checkbox => checkbox.addEventListener('change', calcularTotal));
+    lucroInput.addEventListener('input', calcularTotal);
+
+    // Função de imprimir orçamento
+    document.getElementById('imprimirOrcamento').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Função de enviar para o WhatsApp
+    document.getElementById('enviarWhatsApp').addEventListener('click', () => {
+      const total = document.getElementById('total').textContent;
+      const mensagem = `Olá, o valor do seu orçamento é: R$ ${total}`;
+      const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
+      window.open(url, '_blank');
+    });
+
+    // Inicializar o cálculo ao carregar a página
+    calcularTotal();
+  </script>
+</body>
 </html>
