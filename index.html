@@ -1,170 +1,263 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Orçamento Jardinagem</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carvalho Orçamentos</title>
+  <link rel="manifest" href="/orcamentos/manifest.json" />
+  <link rel="icon" type="image/png" href="icon-192.png" />
+  <meta name="theme-color" content="#4CAF50" />
   <style>
-    body { 
-      font-family: 'Arial', sans-serif; 
-      background-color: black;
-      color: white;
-      padding: 20px;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('1001398390.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+    header {
+      text-align: center;
+      background-color: rgba(255,255,255,0.8);
+      padding: 1rem;
+    }
+    .container {
+      background-color: rgba(255, 255, 255, 0.95);
       max-width: 800px;
-      margin: auto;
+      margin: 2rem auto;
+      padding: 2rem;
+      border-radius: 8px;
     }
-    h1 { 
-      text-align: center; 
-      color: gold;
+    textarea, input[type="text"], input[type="file"], select {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      box-sizing: border-box;
     }
-    table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-bottom: 20px; 
+    .buttons {
+      margin-top: 20px;
+      text-align: center;
     }
-    th, td { 
-      padding: 10px; 
-      border: 1px solid #ccc; 
-      text-align: left; 
+    .buttons button {
+      margin: 5px;
+      padding: 0.8rem 1.5rem;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
-    input[type="number"], input[type="checkbox"] { 
-      width: 60px; 
-    }
-    .total { 
-      font-weight: bold; 
-      font-size: 1.2em; 
-      text-align: right; 
-      color: gold;
-    }
-    .lucro input {
-      width: 80px;
-    }
-    .botoes {
-      display: flex;
-      justify-content: space-between;
+    .qr-section {
+      text-align: center;
       margin-top: 20px;
     }
-    button {
-      background-color: gold;
-      color: black;
-      border: none;
-      padding: 10px 20px;
+    .qr-section img {
+      height: 120px;
+    }
+    .history {
+      margin-top: 30px;
+    }
+    .history-item {
+      background-color: #e8f5e9;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
-    button:hover {
-      background-color: #d4af37;
+    .history-item:hover {
+      background-color: #c8e6c9;
     }
-    @media (max-width: 768px) {
-      .botoes {
-        flex-direction: column;
-      }
+    #configPanel {
+      display: none;
+      position: fixed;
+      right: 0;
+      top: 0;
+      background: white;
+      width: 300px;
+      height: 100%;
+      padding: 20px;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+      overflow-y: auto;
+      z-index: 999;
+    }
+    #configPanel input, #configPanel textarea {
+      margin-bottom: 10px;
+    }
+    #configButton {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1000;
     }
   </style>
 </head>
 <body>
-  <h1>Orçamento Jardinagem</h1>
-  
-  <!-- Tabela de Itens -->
-  <table>
-    <thead>
-      <tr>
-        <th>Serviço / Item</th>
-        <th>Preço (R$)</th>
-        <th>Quantidade</th>
-        <th>Subtotal (R$)</th>
-        <th>Incluir</th>
-      </tr>
-    </thead>
-    <tbody id="itens">
-      <tr>
-        <td>Gasolina maquinário</td>
-        <td>6.05</td>
-        <td><input type="number" min="0" value="0" data-preco="6.05"></td>
-        <td class="subtotal">0.00</td>
-        <td><input type="checkbox" checked></td>
-      </tr>
-      <tr>
-        <td>Diária por prestador</td>
-        <td>50.00</td>
-        <td><input type="number" min="0" value="0" data-preco="50.00"></td>
-        <td class="subtotal">0.00</td>
-        <td><input type="checkbox" checked></td>
-      </tr>
-      <tr>
-        <td>Saco de lixo (unidade)</td>
-        <td>0.50</td>
-        <td><input type="number" min="0" value="0" data-preco="0.50"></td>
-        <td class="subtotal">0.00</td>
-        <td><input type="checkbox" checked></td>
-      </tr>
-      <tr>
-        <td>Gasolina para carro (a cada 10km)</td>
-        <td>20.00</td>
-        <td><input type="number" min="0" value="0" data-preco="20.00"></td>
-        <td class="subtotal">0.00</td>
-        <td><input type="checkbox" checked></td>
-      </tr>
-    </tbody>
-  </table>
 
-  <!-- Lucro e Total -->
-  <div class="lucro">
-    <label for="lucro">Lucro (%)</label>
-    <input type="number" id="lucro" value="20" min="0" max="100">
+  <button id="configButton" onclick="toggleConfig()">⚙️</button>
+
+  <div id="configPanel">
+    <h3>Configurações</h3>
+    <label>Nome da Empresa:</label>
+    <input type="text" id="empresa" />
+
+    <label>Endereço:</label>
+    <input type="text" id="endereco" />
+
+    <label>CNPJ:</label>
+    <input type="text" id="cnpj" />
+
+    <label>Telefone:</label>
+    <input type="text" id="telefone" />
+
+    <label>Desconto Padrão (%):</label>
+    <input type="text" id="desconto" />
+
+    <label>Condições de Pagamento:</label>
+    <textarea id="condicoes" rows="2"></textarea>
+
+    <label>Logo (PNG):</label>
+    <input type="file" id="logoUpload" accept="image/png" />
+
+    <label>QR Code PIX:</label>
+    <input type="file" id="pixUpload" accept="image/png" />
+
+    <label>Tema:</label>
+    <select id="tema">
+      <option value="claro">Claro</option>
+      <option value="escuro">Escuro</option>
+    </select>
+
+    <button onclick="salvarConfiguracoes()">Salvar Configurações</button>
   </div>
-  <div class="total">Total: R$ <span id="total">0.00</span></div>
 
-  <!-- Botões -->
-  <div class="botoes">
-    <button id="imprimirOrcamento">Imprimir orçamento</button>
-    <button id="enviarWhatsApp">Enviar para WhatsApp</button>
+  <header>
+    <h1 id="nomeEmpresa">Carvalho Orçamentos</h1>
+    <p>Soluções profissionais para o seu jardim</p>
+  </header>
+
+  <div class="container">
+    <label for="orcamento">Digite seu orçamento:</label>
+    <textarea id="orcamento" rows="10" placeholder="Itens, preços, condições..."></textarea>
+
+    <div class="buttons">
+      <button onclick="salvarOrcamento()">Salvar Orçamento</button>
+      <button onclick="window.print()">Salvar como PDF</button>
+    </div>
+
+    <div class="qr-section">
+      <p>Pagamento via PIX:</p>
+      <img id="pixImage" src="qr_pix_cortado.png" alt="QR Code PIX" />
+    </div>
+
+    <div class="history">
+      <h3>Histórico de Orçamentos</h3>
+      <input type="text" id="busca" placeholder="Buscar por nome ou data" oninput="buscarHistorico()" />
+      <div id="historico"></div>
+    </div>
   </div>
 
   <script>
-    const inputs = document.querySelectorAll('input[type="number"]');
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    const lucroInput = document.getElementById('lucro');
+    const orcamentoEl = document.getElementById("orcamento");
+    const historicoEl = document.getElementById("historico");
 
-    // Função para calcular o total
-    function calcularTotal() {
-      let total = 0;
-      let lucro = parseFloat(lucroInput.value) / 100;
-
-      inputs.forEach((input, index) => {
-        if (checkboxes[index].checked) {
-          const preco = parseFloat(input.dataset.preco);
-          const qtd = parseFloat(input.value);
-          const subtotal = preco * qtd;
-          input.parentElement.nextElementSibling.textContent = subtotal.toFixed(2);
-          total += subtotal;
-        }
-      });
-
-      total += total * lucro; // Aplicando o lucro
-      document.getElementById('total').textContent = total.toFixed(2);
+    function salvarOrcamento() {
+      const texto = orcamentoEl.value.trim();
+      if (!texto) return alert("Digite o orçamento antes de salvar.");
+      const historico = JSON.parse(localStorage.getItem("historico_orcamentos") || "[]");
+      const novo = { id: Date.now(), texto: texto, data: new Date().toLocaleString() };
+      historico.push(novo);
+      localStorage.setItem("historico_orcamentos", JSON.stringify(historico));
+      orcamentoEl.value = "";
+      carregarHistorico();
+      alert("Orçamento salvo com sucesso!");
     }
 
-    // Eventos de interação
-    inputs.forEach(input => input.addEventListener('input', calcularTotal));
-    checkboxes.forEach(checkbox => checkbox.addEventListener('change', calcularTotal));
-    lucroInput.addEventListener('input', calcularTotal);
+    function carregarHistorico(filtro = "") {
+      const historico = JSON.parse(localStorage.getItem("historico_orcamentos") || "[]");
+      historicoEl.innerHTML = "";
+      historico.reverse().forEach(item => {
+        if (item.texto.toLowerCase().includes(filtro.toLowerCase()) || item.data.includes(filtro)) {
+          const div = document.createElement("div");
+          div.className = "history-item";
+          div.innerHTML = `<strong>${item.data}</strong><br>${item.texto.substring(0, 100)}...`;
+          div.onclick = () => {
+            if (confirm("Carregar este orçamento?")) {
+              orcamentoEl.value = item.texto;
+              window.scrollTo(0, 0);
+            }
+          };
+          historicoEl.appendChild(div);
+        }
+      });
+    }
 
-    // Função de imprimir orçamento
-    document.getElementById('imprimirOrcamento').addEventListener('click', () => {
-      window.print();
+    function buscarHistorico() {
+      const termo = document.getElementById("busca").value;
+      carregarHistorico(termo);
+    }
+
+    function toggleConfig() {
+      const panel = document.getElementById("configPanel");
+      panel.style.display = panel.style.display === "block" ? "none" : "block";
+    }
+
+    function salvarConfiguracoes() {
+      const config = {
+        empresa: document.getElementById("empresa").value,
+        endereco: document.getElementById("endereco").value,
+        cnpj: document.getElementById("cnpj").value,
+        telefone: document.getElementById("telefone").value,
+        desconto: document.getElementById("desconto").value,
+        condicoes: document.getElementById("condicoes").value,
+        tema: document.getElementById("tema").value,
+        logo: localStorage.getItem("logo") || null,
+        pix: localStorage.getItem("pix") || null
+      };
+      localStorage.setItem("config_orcamentos", JSON.stringify(config));
+      alert("Configurações salvas!");
+      aplicarConfiguracoes();
+    }
+
+    function aplicarConfiguracoes() {
+      const config = JSON.parse(localStorage.getItem("config_orcamentos") || "{}");
+      if (config.empresa) document.getElementById("nomeEmpresa").innerText = config.empresa;
+      if (config.pix) document.getElementById("pixImage").src = config.pix;
+      if (config.tema === "escuro") document.body.style.filter = "invert(1)";
+      else document.body.style.filter = "none";
+    }
+
+    // Uploads de imagem para logo e PIX
+    document.getElementById("logoUpload").addEventListener("change", (e) => {
+      const reader = new FileReader();
+      reader.onload = () => localStorage.setItem("logo", reader.result);
+      reader.readAsDataURL(e.target.files[0]);
     });
 
-    // Função de enviar para o WhatsApp
-    document.getElementById('enviarWhatsApp').addEventListener('click', () => {
-      const total = document.getElementById('total').textContent;
-      const mensagem = `Olá, o valor do seu orçamento é: R$ ${total}`;
-      const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-      window.open(url, '_blank');
+    document.getElementById("pixUpload").addEventListener("change", (e) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        localStorage.setItem("pix", reader.result);
+        document.getElementById("pixImage").src = reader.result;
+      };
+      reader.readAsDataURL(e.target.files[0]);
     });
 
-    // Inicializar o cálculo ao carregar a página
-    calcularTotal();
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/orcamentos/sw.js');
+    }
+
+    aplicarConfiguracoes();
+    carregarHistorico();
   </script>
+
 </body>
 </html>
